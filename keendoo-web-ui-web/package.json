@@ -1,10 +1,10 @@
 {
-  "name": "nuxeo-web-ui",
-  "description": "Nuxeo Web UI",
+  "name": "keendoo-web-ui",
+  "description": "Keendoo Web UI",
   "version": "1.0.0",
-  "homepage": "http://www.nuxeo.com",
+  "homepage": "http://www.keendoo.com",
   "license": "Apache-2.0",
-  "vendor": "Nuxeo",
+  "vendor": "Keendoo",
   "private": true,
   "devDependencies": {
     "browser-sync": "^2.10.0",
@@ -45,7 +45,8 @@
   "scripts": {
     "test": "gulp test:local",
     "start": "gulp serve",
-    "lint": "gulp lint && polymer lint -i elements/*/*.html"
+    "lint": "gulp lint && polymer lint -i elements/*/*.html",
+    "serve": "polymer serve"
   },
   "engines": {
     "node": ">=0.10.0"
