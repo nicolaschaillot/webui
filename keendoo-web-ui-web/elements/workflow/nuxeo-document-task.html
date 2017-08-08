@@ -1,0 +1,174 @@
+<!--
+@license
+(C) Copyright Nuxeo Corp. (http://nuxeo.com/)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../bower_components/nuxeo-elements/nuxeo-resource.html">
+<link rel="import" href="../../bower_components/nuxeo-ui-elements/nuxeo-routing-behavior.html">
+<link rel="import" href="../../bower_components/nuxeo-ui-elements/nuxeo-i18n-behavior.html">
+<link rel="import" href="../../bower_components/nuxeo-ui-elements/widgets/nuxeo-date.html">
+<link rel="import" href="../../bower_components/nuxeo-ui-elements/widgets/nuxeo-dialog.html">
+<link rel="import" href="../../bower_components/nuxeo-ui-elements/nuxeo-layout.html">
+<link rel="import" href="../nuxeo-workflow-graph/nuxeo-workflow-graph.html">
+
+<!--
+`nuxeo-document-task`
+@group Nuxeo UI
+@element nuxeo-document-task
+-->
+<dom-module id="nuxeo-document-task">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      nuxeo-workflow-graph {
+        position: relative;
+      }
+
+      .date-field {
+        margin-bottom: 2rem;
+      }
+
+      .date {
+        margin-left: .5rem;
+        color: var(--nuxeo-warn-text);
+      }
+
+      .view-graph {
+        margin-left: .5rem;
+        text-decoration: underline;
+      }
+    </style>
+
+    <nuxeo-resource id="taskRequest" path="/task/[[task.id]]/[[action]]" data="{{taskData}}"></nuxeo-resource>
+
+    <div id="task-body" class="layout vertical">
+
+      <iron-pages selected="[[_selectedTab]]" attr-for-selected="name">
+        <div name="resolution">
+          <nuxeo-dialog id="graphDialog" with-backdrop>
+            <paper-dialog-scrollable>
+              <div class="graph-container">
+                <nuxeo-workflow-graph workflow-id="[[task.workflowInstanceId]]"></nuxeo-workflow-graph>
+              </div>
+            </paper-dialog-scrollable>
+            <div class="buttons">
+              <paper-button noink class="primary" dialog-dismiss>[[i18n('command.close')]]</paper-button>
+            </div>
+          </nuxeo-dialog>
+          <h3>[[i18n(task.name)]]</h3>
+          <div class="horizontal layout center">
+            <span>[[i18n(task.directive)]]</span>
+            <a href="javascript:undefined" on-tap="_toggleGraphDialog" class="view-graph">[[i18n('tasks.viewGraph')]]</a>
+          </div>
+          <div class="date-field horizontal layout">
+            <label>[[i18n('documentTask.dueDate')]]</label>
+            <div class="date"><nuxeo-date datetime="[[task.dueDate]]" format="relative"></nuxeo-date></div>
+          </div>
+
+          <form id="task-container" action="/" is="iron-form">
+            <nuxeo-layout id="layout" href="[[_layoutHref(task)]]" model="[[_layoutModel(task)]]"
+                          error="[[i18n('documentView.layoutNotFound', task.nodeName)]]"></nuxeo-layout>
+          </form>
+
+          <div class="layout horizontal center">
+            <content select=".buttons"></content>
+            <div class="layout horizontal end-justified flex">
+              <template is="dom-repeat" items="[[task.taskInfo.taskActions]]">
+                <paper-button noink dialog-confirm on-tap="_processTask" data-args$="[[item.name]]">[[i18n(item.label)]]</paper-button>
+              </template>
+            </div>
+          </div>
+
+        </div>
+      </iron-pages>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'nuxeo-document-task',
+      behaviors: [Nuxeo.RoutingBehavior, Nuxeo.FormatBehavior],
+      properties: {
+
+        task: {
+          type: Object
+        },
+
+        _selectedTab: {
+          type: String,
+          value: 'resolution'
+        }
+      },
+
+      /**
+       * Returns the name for the current layout element
+       */
+      _layoutHref: function(task) {
+        if (task) {
+          var layout = ['nuxeo', task.nodeName.toLowerCase(), 'layout'].join('-');
+          return this.resolveUrl(task.workflowModelName.toLowerCase() + '/' + layout + '.html');
+        }
+      },
+
+      _layoutModel: function(task) {
+        if (task) {
+          return { document: task.targetDocumentIds[0], task: task };
+        }
+      },
+
+      validate: function() {
+        // run our custom validation function first to allow setting custom native validity
+        var valid = this.$.layout.validate();
+
+        var form = this.$['task-container'];
+
+        // fake submit to trigger native validation checks and UI
+        if (valid) {
+          form._doFakeSubmitForValidation();
+        }
+
+        // XXX: could rely on onsubmit to avoid rechecking for validity
+        return valid && form.validate() && form.checkValidity();
+      },
+
+      _processTask: function(e) {
+        if (this.validate()) {
+          this.action = e.target.dataset.args;
+          this.taskData = {
+            'entity-type': 'task',
+            id: this.$.layout.element.task.id,
+            variables: this.$.layout.element.task.variables
+          };
+          this.$.taskRequest.put().then(function() {
+            this.fire('workflowTaskProcessed');
+          }.bind(this));
+        }
+      },
+
+      _toggleGraphDialog: function() {
+        this.$.graphDialog.toggle();
+      },
+
+    });
+  </script>
+
+</dom-module>

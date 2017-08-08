@@ -1,0 +1,30 @@
+<!--
+`keendoo-endproduct-description-view-layout`
+@group Nuxeo UI
+@element keendoo-endproduct-description-view-layout
+-->
+<dom-module id="keendoo-endproduct-description-view-layout">
+  <template>
+    
+    <div role="widget">
+      <label>[[i18n('label.dublincore.title')]]</label>
+      <div name="title">[[document.properties.dc:title]]</div>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'keendoo-endproduct-description-view-layout',
+      behaviors: [Nuxeo.LayoutBehavior],
+      properties: {
+        /**
+         * @doctype endProduct
+         */
+        document: {
+          type: Object
+        }
+      }
+    });
+  </script>
+</dom-module>
