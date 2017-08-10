@@ -57,7 +57,8 @@ limitations under the License.
     <nuxeo-page class="main">
 
       <div class="header">
-        <nuxeo-breadcrumb document="[[document]]"></nuxeo-breadcrumb>
+        <!--<nuxeo-breadcrumb document="[[document]]"></nuxeo-breadcrumb>-->
+        <keendoo-breadcrumb document="[[document]]"></keendoo-breadcrumb>
         <paper-listbox id="documentViewsItems" selected="{{selectedTab}}" attr-for-selected="name">
           <nuxeo-slot slot="DOCUMENT_VIEWS_ITEMS" model="[[viewsContext]]"></nuxeo-slot>
         </paper-listbox>

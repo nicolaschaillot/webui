@@ -1,0 +1,114 @@
+<!--
+@license
+(C) Copyright Keendoo SAS (http://www.keendoo.com/)
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/nuxeo-ui-elements/nuxeo-layout-behavior.html">
+<link rel="import" href="../nuxeo-document-info/nuxeo-document-info.html">
+<link rel="import" href="nuxeo-document-view.html">
+<link rel="import" href="nuxeo-document-metadata.html">
+<link rel="import" href="nuxeo-document-edit.html">
+
+<!--
+`keendoo-document-page`
+@group Nuxeo UI
+@element keendoo-document-page
+-->
+<dom-module id="keendoo-document-page">
+  <template>
+    <style>
+
+      .page {
+        @apply(--layout-horizontal);
+      }
+
+      .page .main {
+        @apply(--layout-vertical);
+        @apply(--layout-flex-2);
+        padding-right: 1.3rem;
+        /*max-width: 65%;*/
+      }
+
+      @media (max-width: 1024px) {
+        .page {
+          flex-direction: column;
+        }
+        .page .main {
+          padding: 0;
+          margin-bottom: 1rem;
+          max-width: initial;
+        }
+      }
+
+      #edit {
+        position: absolute;
+        z-index: 1;
+        top: 8px;
+        right: 8px;
+      }
+
+      ::content paper-icon-button  {
+        @apply(--nuxeo-action);
+      }
+
+      ::content paper-icon-button:hover  {
+        @apply(--nuxeo-action-hover);
+      }
+
+    </style>
+
+    <nuxeo-document-info-bar document="[[document]]"></nuxeo-document-info-bar>
+
+    <div class="page">
+
+      <div class="main">
+        <nuxeo-document-view document="[[document]]"></nuxeo-document-view>
+      </div>
+
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'keendoo-document-page',
+      behaviors: [Nuxeo.LayoutBehavior],
+      properties: {
+        document: {
+          type: Object,
+          observer: '_documentChanged'
+        },
+
+        edit: {
+          type: Boolean,
+          value: false
+        }
+      },
+      _documentChanged: function() {
+        if (this.document) {
+          this.edit = false;
+        }
+      },
+
+      _isMutable: function(doc) {
+        return !this.hasFacet(doc, 'Immutable') && doc.type !== 'Root' && doc.state !== 'deleted';
+      },
+
+      _canEdit: function(doc) {
+        return doc && doc.type !== 'Root' && this.hasPermission(doc, 'Write') && this._isMutable(doc);
+      },
+
+      _editMode: function() {
+        this.edit = true;
+        this.$.documentEdit.notifyResize();
+      },
+
+      _showCollections: function (doc) {
+        return this.hasCollections(doc);
+      }
+    });
+  </script>
+
+</dom-module>

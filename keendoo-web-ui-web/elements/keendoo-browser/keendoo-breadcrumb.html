@@ -1,0 +1,207 @@
+<!--
+@license
+(C) Copyright Keendoo SAS (http://www.keendoo.com/)
+
+Thanks to : https://css-tricks.com/triangle-breadcrumbs/
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/nuxeo-elements/nuxeo-connection.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/nuxeo-ui-elements/nuxeo-i18n-behavior.html">
+<link rel="import" href="../../bower_components/nuxeo-ui-elements/nuxeo-routing-behavior.html">
+
+<!--
+`keendoo-breadcrumb`
+@group Nuxeo UI
+@element keendoo-breadcrumb
+-->
+<dom-module id="keendoo-breadcrumb">
+  <template>
+
+    <style>
+      :host {
+        min-width: 30%;
+        min-height: 3em;
+        flex: 1;
+      }
+
+      .breadcrumb {
+        margin: .5em 1em 0 0;
+      }
+
+      .breadcrumb {
+        /*centering*/
+        display: inline-block;
+        /*box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.35);*/
+        overflow: hidden;
+        border-radius: 0px;
+        border: 1px solid var(--nuxeo-secondary-color);
+      }
+
+        .breadcrumb a {
+            text-decoration: none;
+            outline: none;
+            display: block;
+            float: left;
+            font-size: 12px;
+            line-height: 32px;
+            color: #246b7d;
+            /*need more margin on the left of links to accomodate the numbers*/
+            padding: 0 15px 0 40px;
+            background: #666;
+            background: linear-gradient(#666, #333);
+            position: relative;
+        }
+        /*since the first link does not have a triangle before it we can reduce the left padding to make it look consistent with other links*/
+        .breadcrumb a:first-child {
+            padding-left: 16px;
+            /*border-radius: 5px 0 0 5px;*/ /*to match with the parent's radius*/
+        }
+        .breadcrumb a:first-child:before {
+            left: 14px;
+        }
+        .breadcrumb a:last-child {
+            /*border-radius: 0 5px 5px 0;*/ /*this was to prevent glitches on hover*/
+            padding-right: 20px;
+        }
+
+        /*hover/active styles*/
+        .breadcrumb a.active, .breadcrumb a:hover{
+            background: #333;
+            background: linear-gradient(#333, #000);
+        }
+        .breadcrumb a.active:after, .breadcrumb a:hover:after {
+            background: #333;
+            background: linear-gradient(135deg, #333, #000);
+        }
+
+        /*adding the arrows for the breadcrumbs using rotated pseudo elements*/
+        .breadcrumb a:after {
+            content: '';
+            position: absolute;
+            top: 0; 
+            right: -18px; /*half of square's length*/
+            /*same dimension as the line-height of .breadcrumb a */
+            width: 36px; 
+            height: 36px;
+            /*as you see the rotated square takes a larger height. which makes it tough to position it properly. So we are going to scale it down so that the diagonals become equal to the line-height of the link. We scale it to 70.7% because if square's: 
+            length = 1; diagonal = (1^2 + 1^2)^0.5 = 1.414 (pythagoras theorem)
+            if diagonal required = 1; length = 1/1.414 = 0.707*/
+            transform: scale(0.707) rotate(45deg);
+            /*we need to prevent the arrows from getting buried under the next link*/
+            z-index: 1;
+            /*background same as links but the gradient will be rotated to compensate with the transform applied*/
+            background: #666;
+            background: linear-gradient(135deg, #666, #333);
+            /*stylish arrow design using box shadow*/
+            box-shadow: 
+                1px -1px 0 0px var(--nuxeo-secondary-color), 
+                3px -3px 0 1px rgba(255, 255, 255, 0.1);
+            /*
+                5px - for rounded arrows and 
+                50px - to prevent hover glitches on the border created using shadows*/
+            border-radius: 0 5px 0 50px;
+        }
+        /*we dont need an arrow after the last link*/
+        .breadcrumb a:last-child:after {
+            content: none;
+        }
+        /*we will use the :before element to show numbers*/
+        .breadcrumb a:before {
+            /*some styles now*/
+            border-radius: 100%;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            margin: 8px 0;
+            position: absolute;
+            top: 0;
+            left: 30px;
+            background: #444;
+            background: linear-gradient(#444, #222);
+            font-weight: bold;
+        }
+
+
+        .flat a, .flat a:after {
+            background: #f5f5f6;
+            color: var(--nuxeo-secondary-color);
+            transition: all 0.5s;
+        }
+        .flat a:before {
+            background: #f5f5f6;
+            box-shadow: 0 0 0 1px #ccc;
+        }
+        .flat a:hover, .flat a:nth-last-child(1), 
+        .flat a:hover:after {
+            background: var(--nuxeo-secondary-color);
+        color: #fff;
+        }
+
+    </style>
+
+    <nuxeo-connection id="nxcon"></nuxeo-connection>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb flat">
+        <template is="dom-repeat" items="[[_breadcrumb(document)]]">
+            <a href$="[[urlFor('browse', item.path)]]">[[item.title]]</a>
+        </template>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'keendoo-breadcrumb',
+      behaviors: [Nuxeo.RoutingBehavior, Nuxeo.I18nBehavior],
+      properties: {
+        document: {
+          type: Object
+        }
+      },
+
+      _breadcrumb: function() {
+        if (this._enrichers) {
+          return this._enrichers.breadcrumb.entries.slice(0, this._enrichers.breadcrumb.entries.length - 1);
+        }
+      },
+
+      _computeCssClass: function(index) {
+        if (this._enrichers) {
+          if (index === this._enrichers.breadcrumb.entries.length - 1) {
+            return 'breadcrumb-item-current';
+          } else if (index === this._enrichers.breadcrumb.entries.length - 2) {
+            return 'breadcrumb-item-parent';
+          } else if (index === this._enrichers.breadcrumb.entries.length - 3) {
+            return 'breadcrumb-item-grand-parent';
+          } else {
+            return 'breadcrumb-item-ancestor';
+          }
+        }
+      },
+
+      _title: function(document) {
+        if (document) {
+          return (document.type === 'Root') ? this.i18n('browse.root') : document.title;
+        }
+      },
+
+      _icon: function(document)  {
+        if (document && document.properties && document.properties['common:icon']) {
+          return this.$.nxcon.url + document.properties['common:icon'];
+        } else {
+          return '';
+        }
+      },
+
+      get _enrichers() {
+        if (this.document) {
+          return this.document.contextParameters;
+        }
+      }
+
+    });
+  </script>
+</dom-module>

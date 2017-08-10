@@ -1,10 +1,3 @@
-<!-- KEENDOO -->
-<nuxeo-slot-content name="keendooshareDocumentAction" slot="DOCUMENT_SECTION_ACTIONS" order="30">
-  <template>
-    <nuxeo-share-button document="[[document]]"></nuxeo-share-button>
-  </template>
-</nuxeo-slot-content>
-
 <!-- ADMIN -->
 
 <nuxeo-slot-content name="adminAnalyticsMenuItem" slot="ADMINISTRATION_MENU" order="10">
@@ -295,6 +288,19 @@
 <nuxeo-slot-content name="documentHistoryPage" slot="DOCUMENT_VIEWS_PAGES" order="30">
   <template>
     <nuxeo-document-history name="history" document="[[document]]"></nuxeo-document-history>
+  </template>
+</nuxeo-slot-content>
+
+<!-- KEENDOO DOCUMENT VIEWS -->
+
+<nuxeo-slot-content name="documentKeendooViewItem" slot="DOCUMENT_VIEWS_ITEMS" order="05">
+  <template>
+    <nuxeo-page-item name="keendoo-view" label="#Keendoo view"></nuxeo-page-item>
+  </template>
+</nuxeo-slot-content>
+<nuxeo-slot-content name="documentKeendooViewPage" slot="DOCUMENT_VIEWS_PAGES" order="05">
+  <template>
+    <keendoo-document-page name="keendoo-view" document="[[document]]"></keendoo-document-page>
   </template>
 </nuxeo-slot-content>
 
