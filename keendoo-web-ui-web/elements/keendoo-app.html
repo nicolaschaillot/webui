@@ -65,8 +65,11 @@
     <style is="custom-style">         
       app-header {
         height: 128px;
-        background: #1f2532;
-        color: #ffffff;
+        /*background: #1f2532;*/
+        color: var(--nuxeo-text-default);
+        --app-header-background-front-layer: {
+          background-color: var(--nuxeo-page-background);
+        };
         --app-header-background-rear-layer: {
           /* When condensed */
           background-color: var(--nuxeo-page-background);
@@ -79,6 +82,9 @@
           padding: 0px;
           background-color: #eee;
         };
+      }
+      app-toolbar.tall {
+        height: 128px;
       }
       paper-header-panel, iron-pages::content paper-header-panel {
         --paper-header-panel-body: {
@@ -167,6 +173,9 @@
           position: relative;
           bottom: auto;
         }
+        [main-title] {
+          left: 85px;
+        }
       }
 
       /* drawer */
@@ -239,6 +248,26 @@
       app-drawer-layout[narrow] ::content nuxeo-page ::content .header {
         margin-left: 32px;
       }
+
+      [main-title] {
+        font-weight: 300;
+        position: absolute;
+        bottom: 40px;
+        left: 180px;
+        font-size: 45px;
+        margin: 0;
+      }
+      [condensed-title] {
+        font-weight: lighter;
+        margin-left: 30px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      [condensed-title] i {
+        font-weight: 100;
+        font-style: normal;
+      }
+
     </style>
 
     <nuxeo-connection id="nxcon" user="{{currentUser}}"></nuxeo-connection>
@@ -255,11 +284,14 @@
     <nuxeo-resource id="task" path="/task/[[currentTaskId]]" headers='{"X-NXfetch.task": "targetDocumentIds,actors"}'></nuxeo-resource>
     
     <app-header-layout fullbleed>
-        <app-header condenses fixed effects="waterfall">
+        <app-header condenses fixed 
+             effects="waterfall resize-snapped-title fade-background"
+             effects-config='{"resize-snapped-title": {"startsAt": 0.8, "duration": "100ms"}, "fade-background": {"startsAt": 0.8, "endsAt": 0.9}}'>
             <app-toolbar id="toolbar">
                 <!--<paper-icon-button icon="menu" on-tap="_drawerToggle"></paper-icon-button>-->
-                <div main-title>PLIM V4</div>
+                <h4 condensed-title>PLIM V4</h4>
             </app-toolbar>
+            <h1 main-title>PLIM V4</h1>
         </app-header>
         <app-drawer-layout id="drawerPanel">
           <div drawer>
