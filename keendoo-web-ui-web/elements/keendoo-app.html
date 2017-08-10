@@ -85,7 +85,6 @@
           background-color: var(--nuxeo-page-background);
         };
         height: 100vh;
-        margin-left: 52px;
       }
       paper-drawer-panel {
         --paper-drawer-panel-left-drawer-container: {
@@ -123,9 +122,9 @@
       /* menu */
       #menu {
         @apply(--nuxeo-sidebar);
-        position: fixed;
+        position: absolute;
         width: 52px;
-        height: calc(100% - 54px);
+        height: calc(100% - 128px);
         z-index: 100;
         padding: 53px 0;
         overflow: auto;
@@ -264,14 +263,13 @@
         </app-header>
         <app-drawer-layout id="drawerPanel">
           <div drawer>
-
-            <!-- logo -->
-            <a id="logo" href$="[[urlFor('home')]]">
-              <iron-icon src$="[[_logo(baseUrl)]]"></iron-icon>
-            </a>
-            
+           
             <!-- menu -->
             <paper-menu id="menu" selected="{{selectedTab}}" attr-for-selected="name" selected-class="selected" on-iron-activate="_toggleDrawer">
+              <!-- logo -->
+              <a id="logo" href$="[[urlFor('home')]]">
+                <iron-icon src$="[[_logo(baseUrl)]]"></iron-icon>
+              </a>
               <nuxeo-slot slot="DRAWER_ITEMS" model="[[actionContext]]"></nuxeo-slot>
               <nuxeo-menu-icon name="administration" icon="nuxeo:admin" label="app.administration" class="admin-icon"
                               hidden$="[[!_hasAdministrationPermissions(currentUser)]]">
@@ -715,9 +713,9 @@
         this.drawerWidth = '350px';
         this.drawerOpened = true;
         var drawerPanel = this.$.drawer;
-        //if (drawerPanel.narrow) {
+        if (drawerPanel.narrow) {
           drawerPanel.toggle();
-        //}
+        }
         if (!this.selectedTab){
           var drawer = this.$['drawer-pages'];
           drawer.selectIndex(0);
