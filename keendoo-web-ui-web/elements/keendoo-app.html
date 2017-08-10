@@ -287,11 +287,12 @@
         <app-header condenses fixed 
              effects="waterfall resize-snapped-title fade-background"
              effects-config='{"resize-snapped-title": {"startsAt": 0.8, "duration": "100ms"}, "fade-background": {"startsAt": 0.8, "endsAt": 0.9}}'>
-            <app-toolbar id="toolbar">
-                <!--<paper-icon-button icon="menu" on-tap="_drawerToggle"></paper-icon-button>-->
-                <h4 condensed-title>PLIM V4</h4>
+            <app-toolbar id="secondary-toolbar">
+                <h4 condensed-title>Secondary toolbar</h4>
             </app-toolbar>
-            <h1 main-title>PLIM V4</h1>
+            <app-toolbar id="primary-toolbar">
+                <h1 main-title>Primary toolbar</h1>
+            </app-toolbar>
         </app-header>
         <app-drawer-layout id="drawerPanel">
           <div drawer>
